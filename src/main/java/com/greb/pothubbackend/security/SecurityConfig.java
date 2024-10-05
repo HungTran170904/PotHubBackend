@@ -1,6 +1,5 @@
 package com.greb.pothubbackend.security;
 
-import com.greb.pothubbackend.configs.JwtConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	private final JwtConfig jwtConfig;
 	private final JwtAuthEntryPoint jwtAuthEntryPoint;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -43,7 +41,7 @@ public class SecurityConfig {
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/auth/**").permitAll()
+						.requestMatchers("/auth/**","/swagger-ui/**", "/v3/api-docs/**").permitAll()
 						.anyRequest().authenticated()
 				);
 		return http.build();

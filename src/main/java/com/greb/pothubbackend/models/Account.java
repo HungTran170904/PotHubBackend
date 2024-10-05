@@ -4,14 +4,20 @@ import com.greb.pothubbackend.constraints.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class User {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Account {
     @Id @UuidGenerator
     private String id;
 
@@ -24,13 +30,13 @@ public class User {
     @Column(nullable=false)
     private String fullName;
 
-    private String avatarUrl;
-
     private Boolean isEnabled = false;
 
     private String otpCode;
 
-    private LocalDateTime otpExpiryDate;
+    private LocalDateTime otpTime;
+
+    private String refreshToken;
 
     @Column(nullable=false)
     private UserRole role;

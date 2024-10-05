@@ -1,8 +1,7 @@
 package com.greb.pothubbackend.security;
 
-import com.greb.pothubbackend.models.User;
+import com.greb.pothubbackend.models.Account;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,27 +10,27 @@ import java.util.Collection;
 
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails{
-	private User user;
+	private Account account;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return AuthorityUtils.commaSeparatedStringToAuthorityList(
-				"ROLE_"+user.getRole().name()
+				"ROLE_"+account.getRole().name()
 		);
 	}
 
-	public User getUser() {
-		return user;
+	public Account getUser() {
+		return account;
 	}
 
 	@Override
 	public String getPassword() {
-		return user.getPassword();
+		return account.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
-		return user.getId();
+		return account.getId();
 	}
 
 	@Override

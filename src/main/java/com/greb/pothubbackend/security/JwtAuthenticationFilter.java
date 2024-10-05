@@ -4,7 +4,6 @@ import com.greb.pothubbackend.configs.JwtConfig;
 import com.greb.pothubbackend.constraints.TokenType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,18 +23,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String rawToken=null;
-        for(Cookie cookie : request.getCookies()) {
-            if(cookie.getName().equals(TokenType.ACCESS_TOKEN.name()))
-                rawToken = cookie.getValue();
+        String bearerToken=request.getHeader(jwtConfig.header());
+
+        if(bearerToken==null || !bearerToken.startsWith(jwtConfig.prefix())){
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        if(rawToken==null || !rawToken.startsWith(jwtConfig.prefix()))
-            filterChain.doFilter(request, response);
-
         try{
-            String token=rawToken.replace(jwtConfig.prefix(), "");
-            String id= jwtProvider.getIdFromToken(token);
+            var claims= jwtProvider.getClaimsFromToken(bearerToken);
+            if(!claims.get("type").toString().equals(TokenType.ACCESS_TOKEN.name()))
+                throw new RuntimeException();
+            String id= claims.get("id").toString();
+
             CustomUserDetails userDetails=userDetailsService.loadUserById(id);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
                     userDetails.getAuthorities());
