@@ -8,6 +8,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -18,7 +20,10 @@ import java.util.Map;
 public class JwtProvider {
 	private final JwtConfig jwtConfig;
 
-	public String generateToken(User user, TokenType tokenType) {
+	public String generateToken(Authentication auth, TokenType tokenType) {
+		CustomUserDetails userDetails=(CustomUserDetails) auth.getPrincipal();
+		User user= userDetails.getUser();
+
 		Date currentDate = new Date();
 		Date expireDate;
 		if(tokenType==TokenType.ACCESS_TOKEN)
@@ -28,7 +33,9 @@ public class JwtProvider {
 
 		String token= Jwts.builder()
 				.setSubject(user.getId())
-				.setClaims(Map.of("role", user.getRole().name()))
+				.setClaims(Map.of(
+						"fullname", user.getFullName(),
+						"role", user.getRole().name()))
 				.setIssuedAt(currentDate)
 				.setExpiration(expireDate)
 				.signWith(SignatureAlgorithm.HS512, jwtConfig.secret().getBytes())

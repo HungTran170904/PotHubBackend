@@ -9,26 +9,29 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-@Data
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails{
-	User u;
+	private User user;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return AuthorityUtils.commaSeparatedStringToAuthorityList(
-				"ROLE_"+u.getRole().name()
+				"ROLE_"+user.getRole().name()
 		);
+	}
+
+	public User getUser() {
+		return user;
 	}
 
 	@Override
 	public String getPassword() {
-		return u.getPassword();
+		return user.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
-		return u.getId();
+		return user.getId();
 	}
 
 	@Override
